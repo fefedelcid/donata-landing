@@ -6,6 +6,15 @@ export default function Branch({ branch }) {
   const others = BRANCHES.filter((b) => b.slug !== branch.slug);
   return (
     <>
+      <nav className="bswitch" aria-label="Cambiar de sucursal">
+        {BRANCHES.map((b) => (
+          <a key={b.slug} href={`#/${b.slug}`} style={{ "--acc": b.accent }}
+             aria-current={b.slug === branch.slug ? "page" : undefined}>
+            {b.short}
+          </a>
+        ))}
+      </nav>
+
       <section className="bhero">
         <img src={branch.hero} alt="" style={{ objectPosition: branch.heroPos }} />
         <div className="wrap bhero__text">
@@ -19,6 +28,8 @@ export default function Branch({ branch }) {
           </div>
         </div>
       </section>
+
+      <div className="bsig" aria-hidden="true" />
 
       <section className="sec sec--cielo">
         <div className="wrap bstory">
@@ -35,6 +46,16 @@ export default function Branch({ branch }) {
       </section>
 
       <section className="sec">
+        <div className="wrap">
+          <div className="bgallery">
+            {branch.gallery.map((g) => (
+              <img key={g.src} src={g.src} alt={g.alt} loading="lazy" style={{ objectPosition: g.pos }} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="sec sec--otras">
         <div className="wrap">
           <h2>Las otras sucursales</h2>
           <div className="plaques">

@@ -9,9 +9,9 @@ export default function Sucursales() {
         <p className="lead">Tres lugares, una misma cerveza y una misma carta.</p>
         <div className="blist">
           {BRANCHES.map((b) => (
-            <article className="bitem" key={b.slug}>
+            <article className="bitem" key={b.slug} style={{ "--acc": b.accent }}>
               <a className="bitem__main" href={`#/${b.slug}`}>
-                <img src={b.thumb} alt="" width="96" height="96" loading="lazy" />
+                <img src={b.thumb} alt="" width="96" height="96" loading="lazy" style={{ objectPosition: b.thumbPos }} />
                 <span>
                   <strong>{b.name}</strong>
                   <span className="bitem__blurb">{b.blurb}</span>

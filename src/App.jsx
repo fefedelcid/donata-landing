@@ -47,6 +47,9 @@ export default function App() {
     document.title = branch
       ? `${branch.name} · Cerveza artesanal en ${branch.area}`
       : TITLES[route] ?? TITLES[""];
+    // cada sucursal recolorea el sitio (ver [data-branch] en styles.css)
+    if (branch) document.documentElement.dataset.branch = branch.slug;
+    else delete document.documentElement.dataset.branch;
     // el pedido se envía por defecto a la última sucursal visitada
     if (branch) {
       setLastBranch(branch.slug);
