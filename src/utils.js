@@ -14,7 +14,7 @@ export function buildOrderMessage({ branch, mesa, lines, total }) {
   );
   return [
     `*Pedido — ${branch.name}*`,
-    `Mesa: *${mesa}*`,
+    ...(mesa ? [`Mesa: *${mesa}*`] : []),
     "",
     ...rows,
     "",

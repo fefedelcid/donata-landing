@@ -1,15 +1,44 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import qrcode from "qrcode-generator";
 import { useCart } from "../cart/CartContext.jsx";
 import { BRANCH } from "../data/branches.js";
-import { money } from "../utils.js";
+import { buildOrderMessage, money, whatsappUrl } from "../utils.js";
 import { IconClose } from "./Icons.jsx";
 
-// Por ahora el pedido NO se envía por WhatsApp (para evitar spam): es una lista
-// para mostrarle al mozo. buildOrderMessage / whatsappUrl siguen en utils.js
-// por si se retoma el envío.
+// El pedido no se envía solo: el cliente genera un QR y el mozo lo escanea.
+// Por ahora el QR codifica el link de WhatsApp con el pedido armado (al
+// escanearlo se abre el chat de la sucursal con el mensaje listo).
+// Para cambiar el destino del QR, editar orderPayload().
+// el link va con el texto codificado (%XX): son solo caracteres ASCII, sin problemas de acentos
+
+function makeQr(text) {
+  const qr = qrcode(0, "L");
+  qr.addData(text);
+  qr.make();
+  return qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
+}
 export default function CartDrawer() {
   const { slug, open, setOpen, lines, count, total, inc, dec, clear } = useCart();
   const closeRef = useRef(null);
+  const [showQr, setShowQr] = useState(false);
+
+  // el QR vuelve a generarse a pedido si cambia el pedido
+  const sig = lines.map((l) => `${l.product.id}x${l.qty}`).join(",");
+  useEffect(() => setShowQr(false), [sig, slug]);
+
+  const orderPayload = () => {
+    const branch = BRANCH[slug];
+    return whatsappUrl(branch, buildOrderMessage({ branch, mesa: "", lines, total }));
+  };
+  const qr = useMemo(() => {
+    if (!showQr) return null;
+    try {
+      return { svg: makeQr(orderPayload()) };
+    } catch {
+      return { error: true };
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showQr, sig, slug]);
 
   useEffect(() => {
     if (!open) return;
@@ -57,7 +86,17 @@ export default function CartDrawer() {
         {count > 0 && (
           <div className="drawer__foot">
             <div className="total"><span>Total</span><strong>{money(total)}</strong></div>
-            <p className="hint">Por ahora el pedido se hace en el local: mostrale esta lista al mozo.</p>
+            {!showQr ? (
+              <button className="btn btn--gold btn--block" onClick={() => setShowQr(true)}>Generar QR para el mozo</button>
+            ) : qr?.error ? (
+              <p className="hint">El pedido es demasiado largo para un QR. Probá con menos productos.</p>
+            ) : (
+              <div className="qr">
+                <div className="qr__code" role="img" aria-label="Código QR con tu pedido" dangerouslySetInnerHTML={{ __html: qr.svg }} />
+                <button className="linkbtn" onClick={() => setShowQr(false)}>Ocultar QR</button>
+              </div>
+            )}
+            <p className="hint">Mostrale al mozo el QR para que tome tu pedido.</p>
             <button className="linkbtn" onClick={() => { clear(); setOpen(false); }}>Vaciar pedido</button>
           </div>
         )}

@@ -1,12 +1,33 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MENUS } from "../data/menu.js";
 import { useCart } from "../cart/CartContext.jsx";
+import { usePhotos } from "../photos/PhotosContext.jsx";
 import { clean, money } from "../utils.js";
 import logo from "../assets/logo.png";
-import { IconClose, IconSearch } from "./Icons.jsx";
+import { IconCamera, IconClose, IconSearch } from "./Icons.jsx";
 
 const PAGE = 8; // productos por tanda: la lista nunca se vuelve interminable
 const HOLD_MS = 380;
+
+// Botón "tomar foto": en el celular abre la cámara; en la compu, el selector de archivos.
+function PhotoButton({ product, children, className = "" }) {
+  const { addPhoto } = usePhotos();
+  const [busy, setBusy] = useState(false);
+  const onChange = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setBusy(true);
+    try { await addPhoto(product.id, file); } catch { /* foto ilegible: se ignora */ } finally { setBusy(false); }
+  };
+  return (
+    <label className={`photobtn ${className}`} onClick={(e) => e.stopPropagation()}>
+      <IconCamera />
+      <span>{busy ? "Guardando…" : children}</span>
+      <input type="file" accept="image/*" capture="environment" onChange={onChange} disabled={busy} />
+    </label>
+  );
+}
 
 function Stepper({ product }) {
   const { qtyOf, inc, dec } = useCart();
@@ -28,7 +49,10 @@ function Stepper({ product }) {
 }
 
 function Card({ product, onPeek, onPeekEnd }) {
+  const { photosOf } = usePhotos();
   const [imgOk, setImgOk] = useState(Boolean(product.image));
+  // portada: la foto del plato; si no hay, la primera que sacó un cliente
+  const cover = (imgOk && product.image) || photosOf(product.id)[0] || null;
   const timer = useRef(null);
   const held = useRef(false);
 
@@ -63,7 +87,7 @@ function Card({ product, onPeek, onPeekEnd }) {
 
   return (
     <article className="card">
-      {imgOk ? (
+      {cover ? (
         <button
           className="card__img"
           onPointerDown={start}
@@ -71,11 +95,12 @@ function Card({ product, onPeek, onPeekEnd }) {
           onContextMenu={(e) => e.preventDefault()}
           aria-label={`Ampliar foto de ${product.name}`}
         >
-          <img src={product.image} alt="" loading="lazy" decoding="async" draggable="false" onError={() => setImgOk(false)} />
+          <img src={cover} alt="" loading="lazy" decoding="async" draggable="false" onError={() => setImgOk(false)} />
         </button>
       ) : (
-        <div className="card__img card__img--ph" aria-hidden="true">
-          <img src={logo} alt="" />
+        <div className="card__img card__img--ph">
+          <img src={logo} alt="" aria-hidden="true" />
+          <PhotoButton product={product} className="photobtn--cover">Sacar foto</PhotoButton>
         </div>
       )}
       <div className="card__body">
@@ -90,8 +115,19 @@ function Card({ product, onPeek, onPeekEnd }) {
   );
 }
 
-function Peek({ peek, onClose }) {
+function Peek({ peek, onClose, slug }) {
   const sticky = peek?.sticky;
+  const p = peek?.product;
+  const { photosOf } = usePhotos();
+  const [idx, setIdx] = useState(0);
+  const mine = p ? photosOf(p.id) : [];
+  // galería: la foto del plato (si hay) + las que sacaron los clientes
+  const images = p ? [...(p.image ? [p.image] : []), ...mine] : [];
+
+  useEffect(() => setIdx(0), [p?.id]);
+  // al sumar una foto nueva, mostrarla
+  useEffect(() => { if (mine.length) setIdx(images.length - 1); }, [mine.length]); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     if (!sticky) return;
     const onKey = (e) => e.key === "Escape" && onClose();
@@ -104,7 +140,7 @@ function Peek({ peek, onClose }) {
   }, [sticky, onClose]);
 
   if (!peek) return null;
-  const p = peek.product;
+  const shown = images[Math.min(idx, images.length - 1)] ?? p.image;
   return (
     <div
       className="peek"
@@ -114,12 +150,26 @@ function Peek({ peek, onClose }) {
       aria-modal={sticky ? "true" : undefined}
       aria-label={sticky ? p.name : undefined}
     >
-      <figure>
-        <img src={p.image} alt={p.name} draggable="false" />
+      <figure onClick={(e) => e.stopPropagation()}>
+        <img className="peek__main" src={shown} alt={p.name} draggable="false" />
         <figcaption>
           <h4>{p.name}</h4>
           {p.description && <p>{p.description}</p>}
           <strong>{money(p.price)}</strong>
+          {sticky && (
+            <div className="peek__photos">
+              {images.length > 1 && (
+                <div className="peek__thumbs" role="group" aria-label="Galería de fotos">
+                  {images.map((src, i) => (
+                    <button key={i} aria-label={`Ver foto ${i + 1}`} aria-current={i === idx} onClick={() => setIdx(i)}>
+                      <img src={src} alt="" draggable="false" />
+                    </button>
+                  ))}
+                </div>
+              )}
+              <PhotoButton product={p}>Tomar otra foto</PhotoButton>
+            </div>
+          )}
         </figcaption>
       </figure>
       {sticky && (
@@ -230,7 +280,7 @@ export default function Menu({ branch }) {
         )}
       </div>
 
-      <Peek peek={peek} onClose={closeAll} />
+      <Peek peek={peek} onClose={closeAll} slug={branch.slug} />
     </section>
   );
 }

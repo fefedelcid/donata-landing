@@ -28,3 +28,6 @@ export const IconStory = () => (
 export const IconSearch = () => (
   <svg {...base}><circle cx="11" cy="11" r="6.5" /><path d="M20 20l-4.2-4.2" /></svg>
 );
+export const IconCamera = () => (
+  <svg {...base}><path d="M4 8h3l1.5-2h7L17 8h3v11H4z" /><circle cx="12" cy="13.5" r="3.5" /></svg>
+);

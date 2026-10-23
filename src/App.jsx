@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { BRANCH } from "./data/branches.js";
+import { PhotosProvider } from "./photos/PhotosContext.jsx";
 import { CartProvider } from "./cart/CartContext.jsx";
 import BranchTabs from "./components/BranchTabs.jsx";
 import Header from "./components/Header.jsx";
@@ -62,6 +63,7 @@ export default function App() {
 
   return (
     <CartProvider slug={branch ? branch.slug : lastBranch}>
+      <PhotosProvider slug={branch ? branch.slug : lastBranch}>
       <Header route={route} slug={lastBranch} />
       {branch && <BranchTabs current={branch.slug} carta={isCarta} />}
       <main>
@@ -71,6 +73,7 @@ export default function App() {
       <BottomNav route={route} slug={lastBranch} />
       <CartBar />
       <CartDrawer />
+      </PhotosProvider>
     </CartProvider>
   );
 }
