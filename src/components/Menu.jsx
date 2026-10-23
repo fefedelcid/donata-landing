@@ -100,7 +100,7 @@ function Card({ product, onPeek, onPeekEnd }) {
       ) : (
         <div className="card__img card__img--ph">
           <img src={logo} alt="" aria-hidden="true" />
-          <PhotoButton product={product} className="photobtn--cover">Sacar foto</PhotoButton>
+          {/* <PhotoButton product={product} className="photobtn--cover">Sacar foto</PhotoButton> */}
         </div>
       )}
       <div className="card__body">
@@ -167,7 +167,7 @@ function Peek({ peek, onClose, slug }) {
                   ))}
                 </div>
               )}
-              <PhotoButton product={p}>Tomar otra foto</PhotoButton>
+              {/* <PhotoButton product={p}>Tomar otra foto</PhotoButton> */}
             </div>
           )}
         </figcaption>
