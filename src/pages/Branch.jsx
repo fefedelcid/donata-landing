@@ -28,10 +28,12 @@ export default function Branch({ branch }) {
             {branch.story.map((p) => <p key={p}>{p}</p>)}
           </div>
           <dl className="datos">
-            <dt>Formato</dt><dd>{branch.kind}</dd>
+            {/* {branch.since && (<><dt>Abrió</dt><dd>{branch.since}</dd></>)} */}
+            {/* {branch.hours && (<><dt>Horario</dt><dd>{branch.hours}</dd></>)} */}
             <dt>Dirección</dt><dd>{branch.address}<br />{branch.area}</dd>
-            <dt>Instagram</dt><dd><a href={igUrl(branch)} target="_blank" rel="noopener noreferrer">@{branch.instagram}</a></dd>
             <dt>WhatsApp</dt><dd><a href={waUrl(branch)} target="_blank" rel="noopener noreferrer">Escribinos</a></dd>
+            <dt>Instagram</dt><dd><a href={igUrl(branch)} target="_blank" rel="noopener noreferrer">@{branch.instagram}</a></dd>
+            <dt>Formato</dt><dd>{branch.kind}</dd>
           </dl>
         </div>
       </section>

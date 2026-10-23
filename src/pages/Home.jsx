@@ -2,10 +2,23 @@ import { BRANCHES, PHOTOS } from "../data/branches.js";
 import Plaque from "../components/Plaque.jsx";
 
 const TIMELINE = [
-  ["2012", "Carmelo y Juanjo, amigos desde el secundario, empiezan a hacer cerveza en la cocina de casa, con ollas comunes."],
-  ["2017", "En un asado, un invitado prueba la cerveza y les pide un plan de negocios. Lo arman, suman un socio y con ese capital compran equipamiento y arman el primer local grande."],
-  ["2023", "Se capacitan en destilación y lanzan su propio gin London Dry."],
-  ["2026", "El 17 de julio abre Refugio Donata en Barreal, frente a la Cordillera."],
+  ["2012", "Carmelo Letizia, arquitecto, y Juanjo de los Ríos, licenciado en Comercio Exterior, amigos desde el secundario, empiezan a hacer cerveza en casa. Los primeros lotes se envasaban en botellas PET."],
+  ["2017", "En un asado, Michael Meding, ejecutivo alemán y cliente fiel de la casa, les pregunta si quieren vivir de la cerveza. Les pide un plan de negocios, lo aprueba y se suma como tercer socio."],
+  ["2018–19", "Con ese impulso llegan los equipos importados y la fábrica pasa de unos 1.000 litros por mes a 25.000."],
+  ["2020–22", "Abre el bar de la fábrica en Rivadavia, con los tanques a la vista. Crece hasta las 90 mesas y la Municipalidad lo toma como kilómetro cero de la Ruta de la Cerveza Artesanal. La cerveza empieza a envasarse en lata de aluminio."],
+  ["Feb. 2023", "Firmamos un convenio con la UNSJ y el CONICET para encontrarle nuevos usos al bagazo."],
+  ["Jun. 2023", "La Italian Grape Ale que hicimos junto a Angualasto gana el Oro en la Copa Argentina de Cervezas."],
+  ["2023–24", "Con un maestro destilador capacitando al equipo, nace el Gin Donata. Después llega la línea 500 Noches."],
+  ["2024", "Nuestros gines ganan cuatro medallas en los Argentina Spirits Awards, en Mendoza."],
+  ["Mar. 2026", "Abre Punto Donata, el primer local fuera de Rivadavia, en el centro de San Juan."],
+  ["Jul. 2026", "El 17 de julio abre Refugio Donata en Barreal, frente a la Cordillera."],
+];
+
+const AWARDS = [
+  ["2023", "Oro, Cervezas Colaborativas", "Italian Grape Ale, con Angualasto · Copa Argentina de Cervezas"],
+  ["2024", "Oro, London Dry", "500 Noches Medias Negras · Argentina Spirits Awards, Mendoza"],
+  ["2024", "Oro, Gins Añejados", "500 Noches Golden y 500 Noches Blue Gin, una medalla cada uno"],
+  ["2024", "Plata, London Dry", "Donata del Desierto Gin"],
 ];
 
 export default function Home() {
@@ -30,43 +43,80 @@ export default function Home() {
           <div>
             <h2>De las ollas de casa a tres sucursales</h2>
             <p>
-              Carmelo Letizia y Juanjo de los Ríos se conocen del secundario. En 2012 empezaron a hacer
-              cerveza en casa, por gusto, para ellos y para los amigos que quisieran probarla. Nadie
-              pensaba todavía en una marca.
+              Donata nació en 2012 entre dos amigos de la infancia. Ninguno venía del mundo de la cerveza:
+              Carmelo es arquitecto y Juanjo, licenciado en Comercio Exterior. Esa mezcla explica bastante
+              de lo que vino después: uno sabía cómo armar un lugar y el otro, cómo traer lo que en San Juan
+              no se conseguía, como maquinaria, maltas y lúpulos.
             </p>
-            <ol className="timeline">
-              {TIMELINE.map(([year, text]) => (
-                <li key={year}><strong>{year}</strong><p>{text}</p></li>
-              ))}
-            </ol>
+            <p>
+              Con los años la cerveza dejó de ser un hobby y pasó a ser el trabajo de los dos. En 2017 se
+              sumó un tercer socio, Michael Meding, y la cervecería casera se convirtió en la fábrica que
+              hoy abastece a las tres sucursales.
+            </p>
           </div>
         </div>
       </section>
 
       <section className="sec">
         <div className="wrap">
-          <h2>Hecha en el desierto</h2>
+          <h2>Año por año</h2>
+          <ol className="timeline">
+            {TIMELINE.map(([year, text]) => (
+              <li key={year}><strong>{year}</strong><p>{text}</p></li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section className="sec sec--cielo">
+        <div className="wrap">
+          <h2>Lo que sale de la fábrica</h2>
+          <div className="facts">
+            <div>
+              <h3>Dorada Pampeana, Session IPA y MandarIPA</h3>
+              <p>La Dorada Pampeana es rubia y limpia, con malta que recuerda al pan y poco amargor.<br/>La Session IPA conserva el aroma frutal de los lúpulos con menos alcohol, ideal para los veranos de San Juan.<br/>La MandarIPA lleva jugo y aceites de mandarinas de la provincia.</p>
+            </div>
+            <div>
+              <h3>Italian Grape Ale</h3>
+              <p>Una cerveza con 18% de mosto de uva sanjuanina, hecha junto a la cervecería Angualasto.<br/>Une dos cosas que San Juan conoce bien: la malta y la vid.</p>
+            </div>
+            <div>
+              <h3>Gin Donata y 500 Noches</h3>
+              <p>El London Dry de la casa tiene notas de melón y pera, algo de pan tostado y un toque floral de lúpulo.<br/>La línea 500 Noches suma las versiones Golden, Blue Gin y Medias Negras.</p>
+            </div>
+          </div>
+          <ul className="awards" aria-label="Premios">
+            {AWARDS.map(([year, medal, what]) => (
+              <li key={year + medal}>
+                <strong>{year}</strong>
+                <span>{medal}<small>{what}</small></span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section className="sec">
+        <div className="wrap">
+          <h2>Hecha en el desierto, con cuidado</h2>
           <p className="intro">
             El “del Desierto” no es un adorno: es San Juan, con su sol, su sequía y su montaña, y de ahí
-            sale la imagen de toda la marca. Crecer no nos cambió la forma de cuidar el producto ni el lugar.
+            sale la imagen de toda la marca. Acá el agua y la energía importan, y por eso las cuidamos.
           </p>
           <div className="facts">
             <div>
-              <h3>Más de 25.000 litros por mes</h3>
-              <p>Empezamos con ollas de cocina. Hoy la fábrica de Rivadavia elabora más de 25.000 litros por mes.</p>
+              <h3>Cuidar el agua</h3>
+              <p>Hacer cerveza gasta entre cinco y siete litros de agua por cada litro. Una torre de enfriamiento de circuito cerrado recicla el agua de refrigeración y ahorra unos 3.000 litros por día. El agua de red, muy dura y salina, pasa por ósmosis inversa y los cerveceros le devuelven las sales justas para cada estilo.</p>
             </div>
             <div>
-              <h3>Agua dura, agua tratada</h3>
-              <p>El agua de San Juan es muy dura y le juega en contra a estilos como la Pilsen o la IPA. La tratamos con ósmosis inversa y desalinización, y de paso cuidamos un recurso que acá no sobra.</p>
+              <h3>Aprovechar el sol</h3>
+              <p>Calefones solares de tubos de vacío precalientan el agua de maceración y bajan el consumo de gas. El próximo paso son paneles fotovoltaicos en el techo de la fábrica.</p>
             </div>
             <div>
-              <h3>El bagazo vuelve al campo</h3>
-              <p>El bagazo, lo que queda de la malta, es cerca del 85% de los residuos de una cervecería. Lo entregamos a productores locales para alimentar ganado.</p>
+              <h3>El bagazo, con la ciencia</h3>
+              <p>Salen unos 1.500 kilos de bagazo húmedo por semana. Con el Instituto de Ingeniería Química de la UNSJ y el CONICET (las doctoras Rosa Rodríguez y Paula Fabani, y el doctor Germán Mazza) estudiamos cómo convertirlo en harina rica en fibra y proteínas y, por pirólisis, en biochar, bioaceite y gas de síntesis. El biochar ayuda a que los suelos áridos retengan agua. Mientras tanto, el bagazo sigue yendo a productores locales como alimento para ganado.</p>
             </div>
           </div>
-          <p className="intro intro--next">
-            Lo que viene: pasar a latas 100% reciclables y sumar paneles solares en la fábrica de Rivadavia.
-          </p>
         </div>
       </section>
     </>
