@@ -1,25 +1,20 @@
 import { useEffect, useState } from "react";
 import { BRANCH } from "./data/branches.js";
 import { CartProvider } from "./cart/CartContext.jsx";
+import BranchTabs from "./components/BranchTabs.jsx";
 import Header from "./components/Header.jsx";
 import BottomNav from "./components/BottomNav.jsx";
 import Footer from "./components/Footer.jsx";
 import CartDrawer, { CartBar } from "./components/CartDrawer.jsx";
 import Home from "./pages/Home.jsx";
-import Sucursales from "./pages/Sucursales.jsx";
-import Historia from "./pages/Historia.jsx";
 import Carta from "./pages/Carta.jsx";
 import Branch from "./pages/Branch.jsx";
 
-const VIEWS = { "": Home, carta: Carta, sucursales: Sucursales, historia: Historia };
-const TITLES = {
-  "": "Donata · Cerveza artesanal de San Juan",
-  carta: "La carta · Donata",
-  sucursales: "Sucursales · Donata",
-  historia: "Nuestra historia · Donata",
-};
+const TITLES = { "": "Donata · Cerveza artesanal de San Juan" };
 
-const readRoute = () => window.location.hash.replace(/^#\/?/, "").split("?")[0];
+// Rutas: #/  ·  #/punto  ·  #/punto/carta  (las viejas #/carta, #/sucursales
+// e #/historia se redirigen)
+const readRoute = () => window.location.hash.replace(/^#\/?/, "").split("?")[0].replace(/\/$/, "");
 const readBranch = () => {
   try {
     const s = localStorage.getItem("donata-branch");
@@ -39,34 +34,43 @@ export default function App() {
     return () => window.removeEventListener("hashchange", onChange);
   }, []);
 
-  const branch = BRANCH[route];
-  const View = VIEWS[route];
+  const [slug, sub] = route.split("/");
+  const branch = BRANCH[slug];
+  const isCarta = Boolean(branch) && sub === "carta";
+  const legacy = route === "carta" ? `#/${lastBranch}/carta` : route === "sucursales" || route === "historia" ? "#/" : null;
+
+  useEffect(() => {
+    if (legacy) window.location.replace(legacy);
+  }, [legacy]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
     document.title = branch
-      ? `${branch.name} · Cerveza artesanal en ${branch.area}`
-      : TITLES[route] ?? TITLES[""];
+      ? isCarta
+        ? `Carta · ${branch.name}`
+        : `${branch.name} · Cerveza artesanal en ${branch.area}`
+      : TITLES[""];
     // cada sucursal recolorea el sitio (ver [data-branch] en styles.css)
     if (branch) document.documentElement.dataset.branch = branch.slug;
     else delete document.documentElement.dataset.branch;
-    // el pedido se envía por defecto a la última sucursal visitada
+    // "Carta" del menú lleva a la carta de la última sucursal visitada
     if (branch) {
       setLastBranch(branch.slug);
       try { localStorage.setItem("donata-branch", branch.slug); } catch { /* sin almacenamiento */ }
     }
-  }, [route, branch]);
+  }, [route, branch, isCarta]);
 
   return (
-    <CartProvider>
-      <Header route={route} />
+    <CartProvider slug={branch ? branch.slug : lastBranch}>
+      <Header route={route} slug={lastBranch} />
+      {branch && <BranchTabs current={branch.slug} carta={isCarta} />}
       <main>
-        {branch ? <Branch key={route} branch={branch} /> : View ? <View /> : <Home />}
+        {legacy ? null : isCarta ? <Carta key={slug} branch={branch} /> : branch ? <Branch key={route} branch={branch} /> : <Home />}
       </main>
-      {route !== "carta" && <Footer />}
-      <BottomNav route={route} />
+      {!isCarta && <Footer />}
+      <BottomNav route={route} slug={lastBranch} />
       <CartBar />
-      <CartDrawer defaultBranch={lastBranch} />
+      <CartDrawer />
     </CartProvider>
   );
 }

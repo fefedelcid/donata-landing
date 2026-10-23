@@ -1,23 +1,21 @@
-import { BRANCH } from "../data/branches.js";
-import { IconHome, IconMenu, IconPin, IconStory } from "./Icons.jsx";
+import { IconHome, IconMenu } from "./Icons.jsx";
 
-export const NAV = [
-  { key: "", label: "Inicio", Icon: IconHome },
-  { key: "carta", label: "Carta", Icon: IconMenu },
-  { key: "sucursales", label: "Sucursales", Icon: IconPin },
-  { key: "historia", label: "Historia", Icon: IconStory },
+// La carta es individual: "Carta" lleva a la de la última sucursal visitada.
+export const navItems = (slug) => [
+  { key: "", label: "Inicio", href: "#/", Icon: IconHome },
+  { key: "carta", label: "Carta", href: `#/${slug}/carta`, Icon: IconMenu },
 ];
 
-// una página de sucursal cuenta como parte de "Sucursales"
+// "-" = una página de sucursal: ningún ítem queda marcado (lo marcan las pestañas)
 export const activeKey = (route) =>
-  BRANCH[route] ? "sucursales" : NAV.some((n) => n.key === route) ? route : "";
+  route === "" ? "" : route.endsWith("/carta") ? "carta" : "-";
 
-export default function BottomNav({ route }) {
+export default function BottomNav({ route, slug }) {
   const active = activeKey(route);
   return (
     <nav className="bnav" aria-label="Principal">
-      {NAV.map(({ key, label, Icon }) => (
-        <a key={key} href={`#/${key}`} aria-current={active === key ? "page" : undefined}>
+      {navItems(slug).map(({ key, label, href, Icon }) => (
+        <a key={key} href={href} aria-current={active === key ? "page" : undefined}>
           <Icon />
           {label}
         </a>

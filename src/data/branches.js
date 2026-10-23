@@ -21,8 +21,7 @@ export const PHOTOS = { cartel, pizza, patio, cerveza, tanques, salon };
 // cuando estás en su página, ver [data-branch] en styles.css), fotos propias y
 // una galería.
 
-// TODO: reemplazar `whatsapp` por el número real de cocina de cada sucursal
-// (formato internacional, sin + ni espacios: 54 + 9 + código de área + número).
+// `whatsapp`: formato internacional, sin + ni espacios (54 + 9 + código de área + número).
 export const BRANCHES = [
   {
     slug: "desierto",
@@ -58,7 +57,7 @@ export const BRANCHES = [
     address: "Av. España y Santa Fe Oeste",
     area: "San Juan Capital",
     instagram: "puntodonata",
-    whatsapp: "5492645304639",
+    whatsapp: "5492644178114",
     story: [
       "Punto Donata es nuestro taproom urbano: un local ágil, pensado para el after office y para salir a tomar algo sin vueltas.",
       "No tiene fábrica propia. Recibe cerveza de forma constante desde la matriz de Rivadavia, y por eso la rotación es rápida y los grifos nunca quedan quietos.",
@@ -82,7 +81,7 @@ export const BRANCHES = [
     address: "Calle Belgrano S/N",
     area: "Barreal, Calingasta",
     instagram: "refugiodonata",
-    whatsapp: "5492645304639",
+    whatsapp: "5492644455433",
     story: [
       "Refugio Donata abrió el 17 de julio de 2026 en Barreal, frente a la Cordillera de los Andes. Es nuestra forma de llevar la marca al valle.",
       "Está pensado para quienes llegan por el turismo rural, de montaña y astronómico: un punto de encuentro para visitantes del país y del exterior.",
@@ -106,3 +105,5 @@ export const mapsUrl = (b) =>
   encodeURIComponent(`${b.name}, ${b.address}, ${b.area}, Argentina`);
 
 export const igUrl = (b) => `https://www.instagram.com/${b.instagram}/`;
+
+export const waUrl = (b) => `https://wa.me/${b.whatsapp}`;

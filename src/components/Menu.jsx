@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MENU } from "../data/menu.js";
+import { MENUS } from "../data/menu.js";
 import { useCart } from "../cart/CartContext.jsx";
 import { clean, money } from "../utils.js";
 import logo from "../assets/logo.png";
@@ -129,7 +129,8 @@ function Peek({ peek, onClose }) {
   );
 }
 
-export default function Menu({ banner }) {
+export default function Menu({ branch }) {
+  const MENU = MENUS[branch.slug];
   const [cat, setCat] = useState(MENU[0].id);
   const [q, setQ] = useState("");
   const [searching, setSearching] = useState(false);
@@ -157,7 +158,7 @@ export default function Menu({ banner }) {
     // si ya se había bajado por la lista, volver al inicio de la categoría nueva
     requestAnimationFrame(() => {
       const top = listRef.current?.getBoundingClientRect().top ?? 999;
-      if (top < 120) window.scrollTo({ top: window.scrollY + top - 130, behavior: "instant" });
+      if (top < 170) window.scrollTo({ top: window.scrollY + top - 180, behavior: "instant" });
     });
   };
 
@@ -167,10 +168,10 @@ export default function Menu({ banner }) {
   return (
     <section className="carta">
       <div className="carta__banner">
-        <img src={banner} alt="" />
+        <img src={branch.hero} alt="" style={{ objectPosition: branch.heroPos }} />
         <div className="wrap">
           <h1>La carta</h1>
-          <p>Una carta para las tres sucursales. Sumá lo que quieras y pedí desde tu mesa.</p>
+          <p>{branch.name}, {branch.area}. <a href={`#/${branch.slug}`}>Conocer la sucursal</a></p>
         </div>
       </div>
 

@@ -1,17 +1,15 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useCart } from "../cart/CartContext.jsx";
-import { BRANCHES, BRANCH } from "../data/branches.js";
-import { buildOrderMessage, money, whatsappUrl } from "../utils.js";
-import { IconClose, IconWhatsapp } from "./Icons.jsx";
+import { BRANCH } from "../data/branches.js";
+import { money } from "../utils.js";
+import { IconClose } from "./Icons.jsx";
 
-export default function CartDrawer({ defaultBranch = "desierto" }) {
-  const { open, setOpen, lines, count, total, inc, dec, clear } = useCart();
-  const [slug, setSlug] = useState(defaultBranch);
-  const [mesa, setMesa] = useState("");
-  const [sent, setSent] = useState(false);
+// Por ahora el pedido NO se envía por WhatsApp (para evitar spam): es una lista
+// para mostrarle al mozo. buildOrderMessage / whatsappUrl siguen en utils.js
+// por si se retoma el envío.
+export default function CartDrawer() {
+  const { slug, open, setOpen, lines, count, total, inc, dec, clear } = useCart();
   const closeRef = useRef(null);
-
-  useEffect(() => setSlug(defaultBranch), [defaultBranch]);
 
   useEffect(() => {
     if (!open) return;
@@ -25,13 +23,6 @@ export default function CartDrawer({ defaultBranch = "desierto" }) {
     };
   }, [open, setOpen]);
 
-  const branch = BRANCH[slug];
-  const mesaOk = /^[A-Za-z0-9]{1,4}$/.test(mesa.trim());
-  const ready = count > 0 && mesaOk;
-  const href = ready
-    ? whatsappUrl(branch, buildOrderMessage({ branch, mesa: mesa.trim(), lines, total }))
-    : undefined;
-
   return (
     <>
       <div className="scrim" data-open={open} onClick={() => setOpen(false)} />
@@ -43,7 +34,7 @@ export default function CartDrawer({ defaultBranch = "desierto" }) {
 
         <div className="drawer__body">
           {count === 0 ? (
-            <p className="empty">Todavía no sumaste nada. Elegí productos de la carta con el botón “Agregar”.</p>
+            <p className="empty">Todavía no sumaste nada. Elegí productos de la carta de {BRANCH[slug]?.name} con el botón “Agregar”.</p>
           ) : (
             <ul className="lines">
               {lines.map(({ product: p, qty }) => (
@@ -65,50 +56,9 @@ export default function CartDrawer({ defaultBranch = "desierto" }) {
 
         {count > 0 && (
           <div className="drawer__foot">
-            <fieldset className="seg">
-              <legend>Sucursal donde estás</legend>
-              {BRANCHES.map((b) => (
-                <button key={b.slug} type="button" aria-pressed={slug === b.slug} onClick={() => setSlug(b.slug)}>
-                  {b.short}
-                </button>
-              ))}
-            </fieldset>
-
-            <label className="mesa">
-              Número de mesa
-              <input
-                value={mesa}
-                onChange={(e) => { setMesa(e.target.value); setSent(false); }}
-                inputMode="text"
-                autoCapitalize="characters"
-                enterKeyHint="done"
-                maxLength={4}
-                placeholder="Ej: 18"
-                aria-invalid={mesa !== "" && !mesaOk}
-              />
-            </label>
-
             <div className="total"><span>Total</span><strong>{money(total)}</strong></div>
-
-            <a
-              className="btn btn--gold btn--block"
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-disabled={!ready}
-              onClick={(e) => (ready ? setSent(true) : e.preventDefault())}
-            >
-              <IconWhatsapp /> Enviar pedido a la cocina
-            </a>
-            {!mesaOk && <p className="hint">Ingresá tu número de mesa para enviar el pedido.</p>}
-            {sent && (
-              <p className="hint">
-                Se abrió WhatsApp con tu pedido. Enviá el mensaje para confirmarlo.{" "}
-                <button className="linkbtn" onClick={() => { clear(); setMesa(""); setSent(false); setOpen(false); }}>
-                  Vaciar pedido
-                </button>
-              </p>
-            )}
+            <p className="hint">Por ahora el pedido se hace en el local: mostrale esta lista al mozo.</p>
+            <button className="linkbtn" onClick={() => { clear(); setOpen(false); }}>Vaciar pedido</button>
           </div>
         )}
       </aside>

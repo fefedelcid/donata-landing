@@ -1,14 +1,14 @@
 import { createContext, useContext, useEffect, useMemo, useReducer, useState } from "react";
-import { PRODUCT_BY_ID } from "../data/menu.js";
+import { PRODUCT_BY_KEY } from "../data/menu.js";
 
-const KEY = "donata-cart-v1";
+const KEY = "donata-cart-v2"; // v2: los pedidos se guardan por sucursal ("sucursal:id")
 
 function load() {
   try {
     const raw = JSON.parse(localStorage.getItem(KEY));
     if (!raw || typeof raw !== "object") return {};
     return Object.fromEntries(
-      Object.entries(raw).filter(([id, q]) => PRODUCT_BY_ID[id] && q > 0)
+      Object.entries(raw).filter(([id, q]) => PRODUCT_BY_KEY[id] && q > 0)
     );
   } catch {
     return {};
@@ -26,7 +26,7 @@ function reducer(state, action) {
       return next;
     }
     case "clear":
-      return {};
+      return Object.fromEntries(Object.entries(state).filter(([key]) => !key.startsWith(action.prefix)));
     default:
       return state;
   }
@@ -34,7 +34,7 @@ function reducer(state, action) {
 
 const Ctx = createContext(null);
 
-export function CartProvider({ children }) {
+export function CartProvider({ slug, children }) {
   const [items, dispatch] = useReducer(reducer, undefined, load);
   const [open, setOpen] = useState(false);
 
@@ -47,22 +47,24 @@ export function CartProvider({ children }) {
   }, [items]);
 
   const value = useMemo(() => {
-    const lines = Object.entries(items).map(([id, qty]) => ({
-      product: PRODUCT_BY_ID[id],
-      qty,
-    }));
+    const k = (id) => `${slug}:${id}`;
+    // solo los productos de la sucursal que se está viendo
+    const lines = Object.entries(items)
+      .filter(([key]) => key.startsWith(`${slug}:`))
+      .map(([key, qty]) => ({ product: PRODUCT_BY_KEY[key], qty }));
     return {
+      slug,
       open,
       setOpen,
       lines,
       count: lines.reduce((n, l) => n + l.qty, 0),
       total: lines.reduce((n, l) => n + l.qty * l.product.price, 0),
-      qtyOf: (id) => items[id] || 0,
-      inc: (id) => dispatch({ type: "inc", id }),
-      dec: (id) => dispatch({ type: "dec", id }),
-      clear: () => dispatch({ type: "clear" }),
+      qtyOf: (id) => items[k(id)] || 0,
+      inc: (id) => dispatch({ type: "inc", id: k(id) }),
+      dec: (id) => dispatch({ type: "dec", id: k(id) }),
+      clear: () => dispatch({ type: "clear", prefix: `${slug}:` }),
     };
-  }, [items, open]);
+  }, [items, open, slug]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

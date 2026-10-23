@@ -1,9 +1,9 @@
 import { useCart } from "../cart/CartContext.jsx";
 import logo from "../assets/logo.png";
-import { NAV, activeKey } from "./BottomNav.jsx";
+import { navItems, activeKey } from "./BottomNav.jsx";
 import { IconCart } from "./Icons.jsx";
 
-export default function Header({ route }) {
+export default function Header({ route, slug }) {
   const { count, setOpen } = useCart();
   const active = activeKey(route);
   return (
@@ -14,8 +14,8 @@ export default function Header({ route }) {
           Donata
         </a>
         <nav className="hdr__nav" aria-label="Secciones">
-          {NAV.map(({ key, label }) => (
-            <a key={key} href={`#/${key}`} aria-current={active === key ? "page" : undefined}>
+          {navItems(slug).map(({ key, label, href }) => (
+            <a key={key} href={href} aria-current={active === key ? "page" : undefined}>
               {label}
             </a>
           ))}
